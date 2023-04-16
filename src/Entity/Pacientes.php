@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\Unique;
 
 #[ORM\Entity(repositoryClass: PacientesRepository::class)]
 class Pacientes
@@ -28,11 +29,11 @@ class Pacientes
     #[ORM\Column]
     private ?int $telefono = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $email = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $observaciones = null;
+    #[ORM\Column(length: 255)]
+    private ?string $password = null;
 
     #[ORM\OneToMany(mappedBy: 'id_paciente', targetEntity: HorarioEnero::class)]
     private Collection $horarioEneros;
@@ -107,14 +108,14 @@ class Pacientes
         return $this;
     }
 
-    public function getObservaciones(): ?string
+    public function getPassword(): ?string
     {
-        return $this->observaciones;
+        return $this->password;
     }
 
-    public function setObservaciones(?string $observaciones): self
+    public function setPassword(?string $password): self
     {
-        $this->observaciones = $observaciones;
+        $this->password = $password;
 
         return $this;
     }

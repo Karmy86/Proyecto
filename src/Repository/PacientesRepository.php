@@ -22,14 +22,14 @@ class PacientesRepository extends ServiceEntityRepository
         parent::__construct($registry, Pacientes::class);
     }
 
-    public function new(string $nombre, string $apellidos, DateTime $fecha_nacimiento, int $telefono, string $email, string $observaciones){
+    public function new(string $nombre, string $apellidos, DateTime $fecha_nacimiento, int $telefono, string $email, string $password){
         $paciente = new Pacientes();
         $paciente->setNombre($nombre)
             ->setApellidos($apellidos)
             ->setFechaNacimiento($fecha_nacimiento)
             ->setTelefono($telefono)
             ->setEmail($email)
-            ->setObservaciones($observaciones);
+            ->setPassword($password);
         $this->getEntityManager()->persist($paciente);
         $this->getEntityManager()->flush();
     }

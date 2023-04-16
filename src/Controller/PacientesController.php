@@ -2,10 +2,6 @@
 
 namespace App\Controller;
 
-/* header("Access-Control-Allow-Origin: *");
-header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-header("Content-Type: application/json"); */
-
 use App\Repository\PacientesRepository;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,15 +10,20 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Pacientes;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+
 
 #[Route('/pacientes')]
 class PacientesController extends AbstractController
 {
     private PacientesRepository $pacientesRepository;
-
+    
     public function __construct(PacientesRepository $pacientesRep)
     {
         $this->pacientesRepository = $pacientesRep;
+        
     }
 
     #[Route('/', name: 'api_pacientes_index', methods: ['GET', 'POST'])]
@@ -38,7 +39,7 @@ class PacientesController extends AbstractController
                 'fecha_nacimiento' => $value->getFechaNacimiento(),
                 'telefono' => $value->getTelefono(),
                 'email' => $value->getEmail(),
-                'observaciones' => $value->getObservaciones()
+                'contraseña' => $value->getPassword()
             ];
 
         return new JsonResponse($data, Response::HTTP_OK);
@@ -49,7 +50,7 @@ class PacientesController extends AbstractController
     {
         $data = json_decode($request->getContent());
 
-        $this->pacientesRepository->new($data->nombre, $data->apellidos, new DateTime($data->fecha_nacimiento), $data->telefono, $data->email, $data->observaciones);
+        $this->pacientesRepository->new($data->nombre, $data->apellidos, new DateTime($data->fecha_nacimiento), $data->telefono, $data->email, $data->password);
 
         return new JsonResponse(['status' => 'Paciente creado'], Response::HTTP_CREATED);
     }
@@ -63,11 +64,32 @@ class PacientesController extends AbstractController
             'apellidos' => $paciente->getApellidos(),
             'fecha_nacimiento' => $paciente->getFechaNacimiento(),
             'telefono' => $paciente->getTelefono(),
-            'email' => $paciente->getEmail(),
-            'observaciones' => $paciente->getObservaciones()
+            'email' => $paciente->getEmail()
         ];
 
         return new JsonResponse($data, Response::HTTP_OK);
+    }
+
+    #[Route('/login', name: 'api_login', methods: ['POST'])]
+    public function login(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $email = $data['email'];
+        $password = $data['password'];
+
+        // Buscamos el usuario por su email en la base de datos
+        $paciente = $this->pacientesRepository->findOneBy([
+            'email' => $email,
+            'password' => $password]);
+
+        // Si el usuario no existe o la contraseña es incorrecta, lanzamos una excepción
+        if (!$paciente) {
+            throw new BadCredentialsException('Email o contraseña incorrecta');
+        }
+        // Si la autenticación es exitosa, puedes devolver una respuesta JSON con un mensaje de éxito
+        return new JsonResponse(['status' => 'Autenticación exitosa'], Response::HTTP_OK);
+
     }
 
     #[Route('/edit/{id}', name: 'api_pacientes_edit', methods: ['PUT', 'PATCH'])]
@@ -84,7 +106,7 @@ class PacientesController extends AbstractController
         empty($data->fecha_nacimiento) ? true : $paciente->setFechaNacimiento(new DateTime($data->fecha_nacimiento));
         empty($data->telefono) ? true : $paciente->setTelefono($data->telefono);
         empty($data->email) ? true : $paciente->setEmail($data->email);
-        empty($data->observaciones) ? true : $paciente->setObservaciones($data->observaciones);
+        empty($data->password) ? true : $paciente->setPassword($data->password);
         $this->pacientesRepository->save($paciente, true);
 
         return new JsonResponse(['status' => $mensaje], Response::HTTP_CREATED);
@@ -93,9 +115,10 @@ class PacientesController extends AbstractController
     #[Route('/delete/{id}', name: 'api_pacientes_delete', methods: ['DELETE'])]
     public function remove(Pacientes $paciente): JsonResponse
     {
-        $email = $paciente->getEmail();
+        $nombre = $paciente->getNombre();
+        $apellidos = $paciente->getApellidos();
         $this->pacientesRepository->remove($paciente, true);
 
-        return new JsonResponse(['status' => 'Paciente ' . $email . ' borrado'], Response::HTTP_OK);
+        return new JsonResponse(['status' => 'Paciente ' . $nombre . " " . $apellidos . ' borrado'], Response::HTTP_OK);
     }
 }

@@ -38,9 +38,13 @@ class Pacientes
     #[ORM\OneToMany(mappedBy: 'id_paciente', targetEntity: HorarioEnero::class)]
     private Collection $horarioEneros;
 
+    #[ORM\OneToMany(mappedBy: 'id_paciente', targetEntity: Reservas::class)]
+    private Collection $reservas;
+
     public function __construct()
     {
         $this->horarioEneros = new ArrayCollection();
+        $this->reservas = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -144,6 +148,36 @@ class Pacientes
             // set the owning side to null (unless already changed)
             if ($horarioEnero->getIdPaciente() === $this) {
                 $horarioEnero->setIdPaciente(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Reservas>
+     */
+    public function getReservas(): Collection
+    {
+        return $this->reservas;
+    }
+
+    public function addReserva(Reservas $reserva): self
+    {
+        if (!$this->reservas->contains($reserva)) {
+            $this->reservas->add($reserva);
+            $reserva->setIdPaciente($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReserva(Reservas $reserva): self
+    {
+        if ($this->reservas->removeElement($reserva)) {
+            // set the owning side to null (unless already changed)
+            if ($reserva->getIdPaciente() === $this) {
+                $reserva->setIdPaciente(null);
             }
         }
 

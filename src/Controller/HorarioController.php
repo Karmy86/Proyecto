@@ -68,15 +68,22 @@ class HorarioController extends AbstractController
         foreach ($diaDispo as $key => $value){
             if ($value !== null){
                 $data[$key] = [
-                    'id' => $value->getId(),
-                    'dia' => $value->getDia()->format('d-m-Y'),
-                    'hora' => $value->getHora()->format('H:m:s'), //mirar bien la vista del formato minutos
-                    'estado' => $value->isEstado(),
-                    'id_paciente_id' => $value->getIdPaciente()
+                    //'id' => $value->getId(),
+                    //'dia' => $value->getDia()->format('d-m-Y'),
+                    'hora' => $value->getHora()->format('H:i:s')
+                    //'estado' => $value->isEstado(),
+                    //'id_paciente_id' => $value->getIdPaciente()
                 ];
             }
         }
-            
+
+        /* $horasDisponibles = [];
+        foreach ($diaDispo as $key => $value) {
+            if ($value !== null && $value->isEstado() == true && $value->getIdPaciente() == null) {
+                $horasDisponibles[] = $value->getHora()->format('H:i:s');
+            }
+        } */
+
 
         return new JsonResponse($data, Response::HTTP_OK);
     }

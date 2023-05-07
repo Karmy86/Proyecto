@@ -8,6 +8,7 @@ use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use DateTimeImmutable;
+use Symfony\Component\Validator\Constraints\Date;
 
 /**
  * @extends ServiceEntityRepository<Reservas>
@@ -49,6 +50,33 @@ class ReservasRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    /**
+     * @return Reservas[]
+     */
+    public function findAllByWeek(DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.dia_hora >= :from')
+            ->andWhere('r.dia_hora <= :to')
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllByWeekAndPatient(DateTimeImmutable $from, DateTimeImmutable $to, int $patientId): array
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.dia_hora >= :from')
+            ->andWhere('r.dia_hora <= :to')
+            ->andWhere('r.id_paciente = :patientId')
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->setParameter('patientId', $patientId)
+            ->getQuery()
+            ->getResult();
     }
 
 //    /**

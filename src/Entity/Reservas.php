@@ -14,7 +14,7 @@ class Reservas
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, unique:true)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, unique:true)]
     private ?\DateTimeInterface $dia_hora = null;
 
     #[ORM\ManyToOne(inversedBy: 'reservas', targetEntity:Pacientes::class)]

@@ -37,7 +37,7 @@ class ReservasController extends AbstractController
         foreach ($reservas as $key => $value)
             $reservas[$key] = [
                 'id' => $value->getId(),
-                'dia_hora' => $value->getDiaHora()
+                'dia_hora' => $value->getDiaHora()->format('Y-m-d H:i:s')
             ];
 
         return new JsonResponse($reservas, Response::HTTP_OK);

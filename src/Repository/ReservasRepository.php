@@ -31,7 +31,6 @@ class ReservasRepository extends ServiceEntityRepository
             ->setIdPaciente($id_paciente);
         $this->getEntityManager()->persist($reserva);
         $this->getEntityManager()->flush();
-        echo(date_default_timezone_get());
     }
 
     public function save(Reservas $entity, bool $flush = false): void

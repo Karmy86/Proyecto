@@ -37,7 +37,8 @@ class ReservasController extends AbstractController
         foreach ($reservas as $key => $value)
             $reservas[$key] = [
                 'id' => $value->getId(),
-                'dia_hora' => $value->getDiaHora()->format('Y-m-d H:i:s')
+                'dia_hora' => $value->getDiaHora()->format('Y-m-d H:i:s'),
+                'id_paciente' => $value->getIdPaciente()->getId()
             ];
 
         return new JsonResponse($reservas, Response::HTTP_OK);
@@ -68,15 +69,16 @@ class ReservasController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         //$timezone = new \DateTimeZone('Europe/Madrid');
-        $dia_hora = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $data['dia_hora'], null);
+        // $dia_hora = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $data['dia_hora'], null);
+        $dia_hora = DateTimeImmutable::createFromFormat('d/m/Y, H:i:s', $data['dia_hora'], null);
         //$dia_hora = $dia_hora->setTimezone(new \DateTimeZone('UTC'));
-        echo $dia_hora->format('Y-m-d H:i:s');
+        // echo $dia_hora->format('Y-m-d H:i:s');
     
         $paciente = $this->pacientesRepository->find($data['id_paciente']);
 
         $reserva = $this->reservasRepository->new($dia_hora, $paciente);
         
-        return new JsonResponse($reserva, Response::HTTP_CREATED);
+        return new JsonResponse(Response::HTTP_CREATED);
     }
 
     private function formatDateTime(string $inputDateTime): DateTimeImmutable {

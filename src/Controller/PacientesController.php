@@ -86,7 +86,7 @@ class PacientesController extends AbstractController
             throw new BadCredentialsException('Email o contraseña incorrecta');
         }
         // Si la autenticación es exitosa, puedes devolver una respuesta JSON con un mensaje de éxito
-        return new JsonResponse(['status' => 'Autenticación exitosa'], Response::HTTP_OK);
+        return new JsonResponse($paciente->getId(), Response::HTTP_OK);
 
     }
 

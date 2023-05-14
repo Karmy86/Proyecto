@@ -33,7 +33,6 @@ class ReservasController extends AbstractController
         $from = $this->formatDateTime($request->query->get('from'));
         $to = $this->formatDateTime($request->query->get('to'));
         $reservas = $reservasRepository->findAllByWeek($from, $to);
-        // echo count($reservas);
         foreach ($reservas as $key => $value)
             $reservas[$key] = [
                 'id' => $value->getId(),
@@ -52,7 +51,6 @@ class ReservasController extends AbstractController
         $to = $this->formatDateTime($request->query->get('to'));
 
         $reservas = $reservasRepository->findAllByWeekAndPatient($from, $to, $patientId);
-        // echo count($reservas);
         foreach ($reservas as $key => $value)
             $reservas[$key] = [
                 'id' => $value->getId(),
@@ -67,12 +65,8 @@ class ReservasController extends AbstractController
     {
 
         $data = json_decode($request->getContent(), true);
-
-        //$timezone = new \DateTimeZone('Europe/Madrid');
-        // $dia_hora = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $data['dia_hora'], null);
+        
         $dia_hora = DateTimeImmutable::createFromFormat('d/m/Y, H:i:s', $data['dia_hora'], null);
-        //$dia_hora = $dia_hora->setTimezone(new \DateTimeZone('UTC'));
-        // echo $dia_hora->format('Y-m-d H:i:s');
     
         $paciente = $this->pacientesRepository->find($data['id_paciente']);
 
